@@ -1,0 +1,12 @@
+model\NFCeProdutoModel.class
+model\PagamentoModel.class
+DAO\NFCeDAO.class
+DAO\NFCeProdutoDAO.class
+DAO\PagamentoDAO.class
+controller\NFCeController.class
+database\FirebirdConnection.class
+util\XMLUtil.class
+controller\XMLProcessor.class
+main\Main.class
+model\NFCeModel.class
+util\ConvertXmlToByteArray.class
