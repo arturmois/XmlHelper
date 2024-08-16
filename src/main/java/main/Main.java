@@ -1,6 +1,7 @@
 package main;
 
-import controller.XMLProcessor;
+import controller.EntradaNotaController;
+import controller.NFCeController;
 import java.io.File;
 
 /**
@@ -11,13 +12,18 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         File xmlDirectory = new File("C:\\Users\\artur\\Downloads\\B333\\NFCE_XML_ZYKHJBUSXC");
-        XMLProcessor controller = new XMLProcessor();
+
+        File xmlEntradaNota = new File("C:\\Users\\artur\\Downloads\\B333\\NFE_XML_404032_20240723090629");
+
+        NFCeController nfceController = new NFCeController();
+        EntradaNotaController entradaNotaController = new EntradaNotaController();
 
         if (xmlDirectory.isDirectory()) {
             File[] xmlFiles = xmlDirectory.listFiles((dir, name) -> name.endsWith(".xml"));
+            File[] EntradaxmlFiles = xmlEntradaNota.listFiles((dir, name) -> name.endsWith(".xml"));
             if (xmlFiles != null) {
-                for (File xmlFile : xmlFiles) {
-                    controller.processXML(xmlFile);
+                for (File xmlFile : EntradaxmlFiles) {
+                    entradaNotaController.processXML(xmlFile);
                 }
             } else {
                 System.out.println("No XML files found in the directory.");

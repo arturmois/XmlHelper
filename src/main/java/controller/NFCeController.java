@@ -32,7 +32,7 @@ import util.LogUtil;
  *
  * @author artur moisés
  */
-public class XMLProcessor {
+public class NFCeController {
 
     public void processXML(File xmlFile) throws Exception {
         Document document = parseXML(xmlFile);
