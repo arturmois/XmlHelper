@@ -19,7 +19,7 @@ public class NFCeDAO {
     }
 
     public int insert(NFCeModel nfce) throws SQLException {
-        String sql = "INSERT INTO NFCE (TIPO_OPERACAO, CODIGO_CLIENTE, CFOP_DA_NOTA, TIPO_DE_COBRANCA, TOTAL_LIQUIDO, QUANTIDADE_DUPLICATAS, INTEVALO_ENTRE_DUPLICATAS, A_PARTIR_DE, EMISSAO, CHAVE_DA_NOTA_ORIGINAL, CHAVE_DA_NOTA_DE_ENTRADA, INFORMACOES_COMPLEMENTARES, STATUS, ULTIMO_PROCESSAMENTO, DESCONTO, CNPJ, AMBIENTE, ATENDENTE, NUMERO_FAIXA, IMPORTOU_TUDO_OS, CODIGO_OPERADOR, VOUTRO, TERMINAL, CODIGO_OS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO NFCE (TIPO_OPERACAO, CODIGO_CLIENTE, CFOP_DA_NOTA, TIPO_DE_COBRANCA, TOTAL_LIQUIDO, QUANTIDADE_DUPLICATAS, INTEVALO_ENTRE_DUPLICATAS, A_PARTIR_DE, EMISSAO, CHAVE_DA_NOTA_ORIGINAL, CHAVE_DA_NOTA_DE_ENTRADA, INFORMACOES_COMPLEMENTARES, STATUS, ULTIMO_PROCESSAMENTO, DESCONTO, XML, CNPJ, AMBIENTE, ATENDENTE, NUMERO_FAIXA, IMPORTOU_TUDO_OS, CODIGO_OPERADOR, VOUTRO, TERMINAL, CODIGO_OS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             // Set parameters based on NFCE object fields
@@ -38,15 +38,16 @@ public class NFCeDAO {
             stmt.setString(13, nfce.getStatus());
             stmt.setString(14, nfce.getUltimoProcessamento());
             stmt.setDouble(15, nfce.getDesconto());
-            stmt.setString(16, nfce.getCnpj());
-            stmt.setInt(17, nfce.getAmbiente());
-            stmt.setInt(18, nfce.getAtendente());
-            stmt.setInt(19, nfce.getNumeroFaixa());
-            stmt.setBoolean(20, nfce.isImportouTudoOs());
-            stmt.setInt(21, nfce.getCodigoOperador());
-            stmt.setInt(22, nfce.getVOutro());
-            stmt.setString(23, nfce.getTerminal());
-            stmt.setInt(24, nfce.getCodigoOs());
+            stmt.setString(16, nfce.getXml());
+            stmt.setString(17, nfce.getCnpj());
+            stmt.setInt(18, nfce.getAmbiente());
+            stmt.setInt(19, nfce.getAtendente());
+            stmt.setInt(20, nfce.getNumeroFaixa());
+            stmt.setBoolean(21, nfce.isImportouTudoOs());
+            stmt.setInt(22, nfce.getCodigoOperador());
+            stmt.setInt(23, nfce.getVOutro());
+            stmt.setString(24, nfce.getTerminal());
+            stmt.setInt(25, nfce.getCodigoOs());
 
             // Execute the insertion
             int affectedRows = stmt.executeUpdate();
@@ -67,4 +68,25 @@ public class NFCeDAO {
             throw e;
         }
     }
+
+    public int getCodigoByFaixa(int faixa) throws SQLException {
+        String sql = "SELECT n.codigo FROM nfce n WHERE n.numero_faixa = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, faixa);
+
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt("codigo"); // Retorna o código encontrado
+                } else {
+                    return -1; // Nenhum código encontrado
+                }
+            }
+        } catch (SQLException e) {
+            // Log da exceção e rethrow ou tratamento adequado
+            System.err.println("Error retrieving NFCe code: " + e.getMessage());
+            throw e;
+        }
+    }
+
 }
