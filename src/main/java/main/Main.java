@@ -21,7 +21,7 @@ public class Main {
         if (xmlDirectory.isDirectory()) {
             File[] xmlFiles = xmlDirectory.listFiles((dir, name) -> name.endsWith(".xml"));
             File[] EntradaxmlFiles = xmlEntradaNota.listFiles((dir, name) -> name.endsWith(".xml"));
-            if (xmlFiles != null) {
+            if (EntradaxmlFiles != null) {
                 for (File xmlFile : EntradaxmlFiles) {
                     entradaNotaController.processXML(xmlFile);
                 }

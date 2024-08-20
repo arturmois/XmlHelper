@@ -1,9 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller;
 
+import DAO.EntradaNotaDAO;
 import DAO.ProdutoDAO;
 import database.FirebirdConnection;
 import java.io.File;
@@ -11,28 +8,31 @@ import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.Timestamp;
+import java.time.Instant;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import model.EntradaNotaModel;
 import model.ProductToUpdate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import util.DateUtil;
 
 /**
  *
  * @author artur
  */
 public class EntradaNotaController {
-
+    
     public void processXML(File xmlFile) throws Exception {
         Connection conn = FirebirdConnection.getConnection();
         ProdutoDAO produtoDAO = new ProdutoDAO(conn);
+        EntradaNotaDAO entradaNotaDAO = new EntradaNotaDAO(conn);
 
         // Parseia o arquivo XML e obtém o documento
         Document document = parseXML(xmlFile);
@@ -45,10 +45,8 @@ public class EntradaNotaController {
 
         // Obtém a lista de todos os elementos "det" dentro do elemento "NFe"
         NodeList detList = NFe.getElementsByTagName("det");
-
-        // Cria um mapa para armazenar os elementos "det" associados a seus códigos
-        Map<Integer, Element> nfeMap = new HashMap<>();
-
+        
+        processEntradaNota(nfeProc, entradaNotaDAO);
         // Loop através de cada elemento "det"
         for (int i = 0; i < detList.getLength(); i++) {
             // Converte o nó em um Elemento
@@ -60,12 +58,12 @@ public class EntradaNotaController {
             }
         }
     }
-
+    
     private Document parseXML(File xmlFile) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         return factory.newDocumentBuilder().parse(xmlFile);
     }
-
+    
     private String convertNodeToString(Element element) throws TransformerException {
         try {
             // Cria um StringWriter para armazenar a saída em String
@@ -84,7 +82,28 @@ public class EntradaNotaController {
             return null;
         }
     }
-
+    
+    private void processEntradaNota(Element det, EntradaNotaDAO entradaNotaDAO) throws TransformerException, SQLException {
+        EntradaNotaModel entradaNotaModel = new EntradaNotaModel();
+        
+        String chave = getElementValue(det, "chNFe");
+        String xml = convertNodeToString(det).replaceAll(">\\s+<", "><");
+        String dataEntrada = getElementValue(det, "dhEmi");
+        String cfop = getElementValue(det, "CFOP");
+       
+        
+        entradaNotaModel.setChaveNFe(chave);
+        entradaNotaModel.setXml(xml);
+        entradaNotaModel.setDataHoraEntrada(DateUtil.convertStringToTimestamp(dataEntrada));
+        entradaNotaModel.setDataEntradaProdutos(Timestamp.valueOf("2024-07-31 12:00:00"));
+        entradaNotaModel.setCfop(cfop);
+        entradaNotaModel.setStatus("IMPORTADA");
+        entradaNotaModel.setStatausManifestacao("CONFIRMACAO");
+        entradaNotaModel.setXml2("");
+        
+        entradaNotaDAO.insert(entradaNotaModel);
+    }
+    
     private void processProduct(Element det, ProductToUpdate product, ProdutoDAO produtoDAO) throws SQLException {
         BigDecimal newQuantity = new BigDecimal(getElementValue(det, "qCom"));
         if (newQuantity.compareTo(BigDecimal.ZERO) >= 0) {
@@ -95,7 +114,7 @@ public class EntradaNotaController {
         } else {
             System.out.println("none");
         }
-
+        
         System.out.println();
     }
 

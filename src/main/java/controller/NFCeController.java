@@ -172,7 +172,13 @@ public class NFCeController {
         produto.setUnidade(getElementValue(det, "uCom"));
         produto.setCfop(Integer.parseInt(getElementValue(det, "CFOP")));
         produto.setDescricao(getElementValue(det, "xProd"));
-        produto.setCodBarras(getElementValue(det, "cEAN"));
+        String gtin = getElementValue(det, "cEAN");
+        if (gtin.equals("SEM GTIN")) {
+            produto.setCodBarras("");
+        } else {
+            produto.setCodBarras(gtin);
+        }
+
         produto.setValorCusto(Double.parseDouble(getElementValue(det, "vProd"))); //verificar
         produto.setRefGrade(""); //verificar
         produto.setResponsavel(0);
